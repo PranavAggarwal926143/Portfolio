@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pranav Aggarwal — CS Developer</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            mono: ['"Space Mono"', 'monospace'],
+            sans: ['Syne', 'sans-serif'],
+          },
+          colors: {
+            cyan: { 400: '#22d3ee', 300: '#67e8f9', 500: '#06b6d4' },
+            emerald: { 400: '#34d399', 300: '#6ee7b7' },
+            slate: {
+              950: '#020617', 900: '#0f172a', 800: '#1e293b',
+              700: '#334155', 600: '#475569', 400: '#94a3b8', 200: '#e2e8f0',
+            },
+          },
+          animation: {
+            'glitch': 'glitch 3s infinite',
+            'scan': 'scan 8s linear infinite',
+            'blink': 'blink 1s step-end infinite',
+            'float': 'float 6s ease-in-out infinite',
+            'fadeUp': 'fadeUp 0.7s ease forwards',
+            'slideRight': 'slideRight 0.6s ease forwards',
+          },
+          keyframes: {
+            glitch: {
+              '0%, 100%': { clipPath: 'inset(0 0 100% 0)', transform: 'translateX(0)' },
+              '10%': { clipPath: 'inset(10% 0 60% 0)', transform: 'translateX(-4px)' },
+              '20%': { clipPath: 'inset(50% 0 30% 0)', transform: 'translateX(4px)' },
+              '30%': { clipPath: 'inset(0 0 100% 0)', transform: 'translateX(0)' },
+            },
+            scan: {
+              '0%': { transform: 'translateY(-100%)' },
+              '100%': { transform: 'translateY(100vh)' },
+            },
+            blink: {
+              '0%, 100%': { opacity: '1' },
+              '50%': { opacity: '0' },
+            },
+            float: {
+              '0%, 100%': { transform: 'translateY(0px)' },
+              '50%': { transform: 'translateY(-12px)' },
+            },
+            fadeUp: {
+              '0%': { opacity: '0', transform: 'translateY(32px)' },
+              '100%': { opacity: '1', transform: 'translateY(0)' },
+            },
+            slideRight: {
+              '0%': { opacity: '0', transform: 'translateX(-24px)' },
+              '100%': { opacity: '1', transform: 'translateX(0)' },
+            },
+          },
+        },
+      },
+    }
+  </script>
+
+  <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body class="dark bg-slate-950 text-slate-200 font-sans overflow-x-hidden">
+
+  <!-- Scanline overlay -->
+  <div class="scanline-overlay pointer-events-none fixed inset-0 z-50"></div>
+  <!-- Noise texture -->
+  <div class="noise-overlay pointer-events-none fixed inset-0 z-40 opacity-[0.03]"></div>
+
+  <!-- ═══════════════════════════════════════════
+       NAVBAR
+  ═══════════════════════════════════════════ -->
+  <nav id="navbar" class="fixed top-0 left-0 right-0 z-30 transition-all duration-300">
+    <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+      <!-- Logo -->
+      <a href="#hero" class="font-mono text-cyan-400 font-bold text-lg tracking-widest group">
+        <span class="text-slate-400">&lt;</span>PA
+        <span class="text-slate-400 group-hover:text-cyan-400 transition-colors">/&gt;</span>
+      </a>
+
+      <!-- Desktop nav links -->
+      <div class="hidden md:flex items-center gap-8">
+        <a href="#about" class="nav-link font-mono text-sm text-slate-400 hover:text-cyan-400 transition-colors tracking-wider">about</a>
+        <a href="#skills" class="nav-link font-mono text-sm text-slate-400 hover:text-cyan-400 transition-colors tracking-wider">skills</a>
+        <a href="#projects" class="nav-link font-mono text-sm text-slate-400 hover:text-cyan-400 transition-colors tracking-wider">projects</a>
+        <a href="#education" class="nav-link font-mono text-sm text-slate-400 hover:text-cyan-400 transition-colors tracking-wider">education</a>
+        <a href="#contact" class="nav-link font-mono text-sm text-slate-400 hover:text-cyan-400 transition-colors tracking-wider">contact</a>
+      </div>
+
+      <!-- Right controls -->
+      <div class="flex items-center gap-4">
+        <!-- Theme toggle -->
+        <button id="themeToggle" aria-label="Toggle theme"
+          class="w-9 h-9 rounded-full border border-slate-700 flex items-center justify-center text-slate-400 hover:text-cyan-400 hover:border-cyan-400 transition-all text-sm">
+          <span id="themeIcon">☀</span>
+        </button>
+        <!-- Hamburger -->
+        <button id="menuToggle" class="md:hidden flex flex-col gap-1.5 p-1" aria-label="Menu">
+          <span class="menu-bar w-6 h-0.5 bg-slate-400 transition-all"></span>
+          <span class="menu-bar w-6 h-0.5 bg-slate-400 transition-all"></span>
+          <span class="menu-bar w-6 h-0.5 bg-slate-400 transition-all"></span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Mobile menu -->
+    <div id="mobileMenu" class="hidden md:hidden bg-slate-900 border-t border-slate-800 px-6 py-4 flex flex-col gap-4">
+      <a href="#about" class="mobile-nav-link font-mono text-sm text-slate-400 hover:text-cyan-400 transition-colors">about</a>
+      <a href="#skills" class="mobile-nav-link font-mono text-sm text-slate-400 hover:text-cyan-400 transition-colors">skills</a>
+      <a href="#projects" class="mobile-nav-link font-mono text-sm text-slate-400 hover:text-cyan-400 transition-colors">projects</a>
+      <a href="#education" class="mobile-nav-link font-mono text-sm text-slate-400 hover:text-cyan-400 transition-colors">education</a>
+      <a href="#contact" class="mobile-nav-link font-mono text-sm text-slate-400 hover:text-cyan-400 transition-colors">contact</a>
+    </div>
+  </nav>
+
+  <!-- ═══════════════════════════════════════════
+       HERO SECTION
+  ═══════════════════════════════════════════ -->
+  <section id="hero" class="relative min-h-screen flex items-center justify-center overflow-hidden">
+    <!-- Radial glow bg -->
+    <div class="absolute inset-0 hero-bg pointer-events-none"></div>
+    <!-- Grid pattern -->
+    <div class="absolute inset-0 grid-pattern pointer-events-none opacity-20"></div>
+
+    <!-- Floating code snippets (decorative) -->
+    <div class="absolute top-1/4 left-4 md:left-10 font-mono text-xs text-cyan-400/20 select-none pointer-events-none floating-code">
+      <div>import numpy as np</div>
+      <div>import tensorflow as tf</div>
+      <div>from sklearn import model</div>
+    </div>
+    <div class="absolute bottom-1/4 right-4 md:right-10 font-mono text-xs text-emerald-400/20 select-none pointer-events-none floating-code" style="animation-delay:2s">
+      <div>def train_model():</div>
+      <div>&nbsp;&nbsp;epochs = 100</div>
+      <div>&nbsp;&nbsp;return accuracy</div>
+    </div>
+
+    <div class="relative z-10 max-w-4xl mx-auto px-6 text-center">
+      <!-- Status badge -->
+      <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-emerald-400/30 bg-emerald-400/5 font-mono text-xs text-emerald-400 mb-8 reveal-item">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+        available for opportunities
+      </div>
+
+      <!-- Name -->
+      <div class="relative mb-4 reveal-item" style="animation-delay:0.1s">
+        <h1 class="text-5xl sm:text-7xl md:text-8xl font-sans font-extrabold tracking-tight leading-none">
+          <span class="text-white">Pranav</span>
+          <span class="gradient-text"> Aggarwal</span>
+        </h1>
+        <!-- Glitch echo -->
+        <h1 class="glitch-echo text-5xl sm:text-7xl md:text-8xl font-sans font-extrabold tracking-tight leading-none absolute inset-0 opacity-0" aria-hidden="true">
+          Pranav Aggarwal
+        </h1>
+      </div>
+
+      <!-- Typed role -->
+      <div class="font-mono text-base sm:text-xl text-cyan-400 mb-6 h-8 reveal-item" style="animation-delay:0.2s">
+        <span id="typed-text"></span><span class="animate-blink text-cyan-400">_</span>
+      </div>
+
+      <!-- Short bio -->
+      <p class="max-w-xl mx-auto text-slate-400 text-base sm:text-lg leading-relaxed mb-10 reveal-item" style="animation-delay:0.3s">
+        CS student building at the intersection of code and curiosity.
+        Passionate about <span class="text-emerald-400">AI/ML</span>, clean systems,
+        and turning ideas into real products.
+      </p>
+
+      <!-- CTAs -->
+      <div class="flex flex-col sm:flex-row gap-4 justify-center reveal-item" style="animation-delay:0.4s">
+        <a href="#projects"
+          class="px-8 py-3 bg-cyan-400 text-slate-950 font-sans font-bold rounded-sm hover:bg-cyan-300 transition-all text-sm tracking-wide hover:shadow-[0_0_24px_rgba(34,211,238,0.5)] active:scale-95">
+          View Projects →
+        </a>
+        <a href="#contact"
+          class="px-8 py-3 border border-cyan-400 text-cyan-400 font-sans font-bold rounded-sm hover:bg-cyan-400/10 transition-all text-sm tracking-wide hover:shadow-[0_0_16px_rgba(34,211,238,0.2)] active:scale-95">
+          Contact Me
+        </a>
+      </div>
+
+      <!-- Scroll hint -->
+      <div class="mt-20 flex flex-col items-center gap-2 opacity-40 reveal-item" style="animation-delay:0.6s">
+        <span class="font-mono text-xs text-slate-500">scroll</span>
+        <div class="scroll-arrow w-px h-10 bg-gradient-to-b from-slate-500 to-transparent relative overflow-hidden">
+          <div class="scroll-dot w-1 h-4 bg-cyan-400 absolute top-0 left-1/2 -translate-x-1/2 animate-[scan_1.5s_ease-in-out_infinite]"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════
+       ABOUT SECTION
+  ═══════════════════════════════════════════ -->
+  <section id="about" class="py-28 max-w-6xl mx-auto px-6">
+    <div class="grid md:grid-cols-2 gap-16 items-center">
+      <!-- Left: text -->
+      <div class="reveal-item">
+        <div class="section-label font-mono text-xs text-cyan-400 tracking-[0.3em] mb-3">01 / ABOUT</div>
+        <h2 class="text-3xl sm:text-4xl font-extrabold mb-6 leading-tight">
+          Building foundations.<br/>
+          <span class="gradient-text">Thinking long-term.</span>
+        </h2>
+        <p class="text-slate-400 leading-relaxed mb-4">
+          I'm a first-year Computer Science Engineering student at
+          <span class="text-white font-semibold">Manav Rachna Institute of Research and Studies</span>.
+          I believe the best engineers aren't the ones who know the most frameworks — they're the ones
+          who genuinely understand how things work.
+        </p>
+        <p class="text-slate-400 leading-relaxed mb-4">
+          My current obsession: building strong fundamentals in Python, DSA, and systems — so that
+          when I eventually dive deep into <span class="text-emerald-400 font-semibold">AI/ML</span>,
+          I'm building on granite, not sand.
+        </p>
+        <p class="text-slate-400 leading-relaxed">
+          Outside of code, I think about writing clearly, speaking confidently, and learning
+          how to learn — skills that compound faster than any tech stack.
+        </p>
+
+        <!-- Quick facts -->
+        <div class="mt-8 grid grid-cols-2 gap-4">
+          <div class="border border-slate-800 p-4 rounded-sm bg-slate-900/50 hover:border-cyan-400/30 transition-colors">
+            <div class="font-mono text-cyan-400 text-xl font-bold">2027</div>
+            <div class="text-slate-500 text-xs mt-1">Expected Graduation</div>
+          </div>
+          <div class="border border-slate-800 p-4 rounded-sm bg-slate-900/50 hover:border-cyan-400/30 transition-colors">
+            <div class="font-mono text-emerald-400 text-xl font-bold">AI/ML</div>
+            <div class="text-slate-500 text-xs mt-1">Primary Interest</div>
+          </div>
+          <div class="border border-slate-800 p-4 rounded-sm bg-slate-900/50 hover:border-cyan-400/30 transition-colors">
+            <div class="font-mono text-cyan-400 text-xl font-bold">10Y+</div>
+            <div class="text-slate-500 text-xs mt-1">Career Horizon</div>
+          </div>
+          <div class="border border-slate-800 p-4 rounded-sm bg-slate-900/50 hover:border-cyan-400/30 transition-colors">
+            <div class="font-mono text-emerald-400 text-xl font-bold">∞</div>
+            <div class="text-slate-500 text-xs mt-1">Curiosity Level</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: terminal card -->
+      <div class="reveal-item" style="animation-delay:0.15s">
+        <div class="terminal-card border border-slate-700 rounded-sm bg-slate-900 overflow-hidden hover:border-cyan-400/40 transition-all hover:shadow-[0_0_40px_rgba(34,211,238,0.06)]">
+          <!-- Terminal header -->
+          <div class="flex items-center gap-2 px-4 py-3 border-b border-slate-800 bg-slate-950">
+            <div class="w-3 h-3 rounded-full bg-red-500/70"></div>
+            <div class="w-3 h-3 rounded-full bg-yellow-500/70"></div>
+            <div class="w-3 h-3 rounded-full bg-green-500/70"></div>
+            <span class="font-mono text-xs text-slate-500 ml-2">pranav@dev ~ </span>
+          </div>
+          <!-- Terminal body -->
+          <div class="p-5 font-mono text-sm space-y-2">
+            <div><span class="text-cyan-400">$</span> <span class="text-white">whoami</span></div>
+            <div class="text-slate-300 pl-2">Pranav Aggarwal</div>
+            <div class="mt-2"><span class="text-cyan-400">$</span> <span class="text-white">cat interests.txt</span></div>
+            <div class="text-emerald-400 pl-2">["AI/ML", "DSA", "Python",</div>
+            <div class="text-emerald-400 pl-2"> "Web Dev", "Open Source"]</div>
+            <div class="mt-2"><span class="text-cyan-400">$</span> <span class="text-white">echo $GOAL</span></div>
+            <div class="text-slate-300 pl-2">Build meaningful tech. Think clearly.</div>
+            <div class="mt-2"><span class="text-cyan-400">$</span> <span class="text-white">./status.sh</span></div>
+            <div class="text-yellow-400 pl-2">[LOADING] Learning hard every day...</div>
+            <div class="text-emerald-400 pl-2">[OK] Foundations: in progress ▓▓▓▓▓░░</div>
+            <div class="mt-2 flex items-center gap-1">
+              <span class="text-cyan-400">$</span>
+              <span class="text-white">_</span>
+              <span class="animate-blink text-cyan-400">|</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════
+       SKILLS SECTION
+  ═══════════════════════════════════════════ -->
+  <section id="skills" class="py-28 border-t border-slate-800/50">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="text-center mb-16 reveal-item">
+        <div class="section-label font-mono text-xs text-cyan-400 tracking-[0.3em] mb-3">02 / SKILLS</div>
+        <h2 class="text-3xl sm:text-4xl font-extrabold">
+          Technical <span class="gradient-text">Arsenal</span>
+        </h2>
+      </div>
+
+      <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+        <!-- Skill cards -->
+        <div class="skill-card reveal-item" style="animation-delay:0s">
+          <div class="skill-icon">⚙️</div>
+          <div class="skill-name">C Programming</div>
+          <div class="skill-bar-track"><div class="skill-bar" data-width="72"></div></div>
+          <div class="skill-level">Intermediate</div>
+        </div>
+        <div class="skill-card reveal-item" style="animation-delay:0.05s">
+          <div class="skill-icon">🐍</div>
+          <div class="skill-name">Python</div>
+          <div class="skill-bar-track"><div class="skill-bar" data-width="78"></div></div>
+          <div class="skill-level">Intermediate</div>
+        </div>
+        <div class="skill-card reveal-item" style="animation-delay:0.1s">
+          <div class="skill-icon">🤖</div>
+          <div class="skill-name">AI / ML</div>
+          <div class="skill-bar-track"><div class="skill-bar" data-width="50"></div></div>
+          <div class="skill-level">Learning</div>
+        </div>
+        <div class="skill-card reveal-item" style="animation-delay:0.15s">
+          <div class="skill-icon">🌐</div>
+          <div class="skill-name">Web Development</div>
+          <div class="skill-bar-track"><div class="skill-bar" data-width="65"></div></div>
+          <div class="skill-level">Intermediate</div>
+        </div>
+        <div class="skill-card reveal-item" style="animation-delay:0.2s">
+          <div class="skill-icon">🧩</div>
+          <div class="skill-name">Data Structures & Algorithms</div>
+          <div class="skill-bar-track"><div class="skill-bar" data-width="60"></div></div>
+          <div class="skill-level">Building</div>
+        </div>
+        <div class="skill-card reveal-item" style="animation-delay:0.25s">
+          <div class="skill-icon">🔧</div>
+          <div class="skill-name">Git & GitHub</div>
+          <div class="skill-bar-track"><div class="skill-bar" data-width="70"></div></div>
+          <div class="skill-level">Intermediate</div>
+        </div>
+        <div class="skill-card reveal-item" style="animation-delay:0.3s">
+          <div class="skill-icon">🔌</div>
+          <div class="skill-name">APIs & Backend Basics</div>
+          <div class="skill-bar-track"><div class="skill-bar" data-width="52"></div></div>
+          <div class="skill-level">Exploring</div>
+        </div>
+        <div class="skill-card reveal-item" style="animation-delay:0.35s">
+          <div class="skill-icon">🧠</div>
+          <div class="skill-name">Problem Solving</div>
+          <div class="skill-bar-track"><div class="skill-bar" data-width="75"></div></div>
+          <div class="skill-level">Strong</div>
+        </div>
+        <div class="skill-card reveal-item" style="animation-delay:0.4s">
+          <div class="skill-icon">📱</div>
+          <div class="skill-name">Modern Technologies</div>
+          <div class="skill-bar-track"><div class="skill-bar" data-width="58"></div></div>
+          <div class="skill-level">Growing</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════
+       PROJECTS SECTION
+  ═══════════════════════════════════════════ -->
+  <section id="projects" class="py-28 border-t border-slate-800/50">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="text-center mb-16 reveal-item">
+        <div class="section-label font-mono text-xs text-cyan-400 tracking-[0.3em] mb-3">03 / PROJECTS</div>
+        <h2 class="text-3xl sm:text-4xl font-extrabold">
+          Things I've <span class="gradient-text">Built</span>
+        </h2>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-6">
+
+        <!-- Project 1 -->
+        <div class="project-card reveal-item group" style="animation-delay:0s">
+          <div class="project-header">
+            <div class="flex items-start justify-between">
+              <div>
+                <div class="font-mono text-xs text-cyan-400 mb-2">Python · ML</div>
+                <h3 class="text-xl font-bold text-white group-hover:text-cyan-400 transition-colors">Spam Email Classifier</h3>
+              </div>
+              <div class="project-links flex gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                <a href="#" class="font-mono text-xs text-slate-400 hover:text-cyan-400">GitHub ↗</a>
+              </div>
+            </div>
+          </div>
+          <p class="text-slate-400 text-sm leading-relaxed my-4">
+            Built a Naive Bayes classifier to detect spam emails with ~95% accuracy.
+            Used Python, scikit-learn, and NLTK for text preprocessing and feature extraction.
+          </p>
+          <div class="flex flex-wrap gap-2 mt-auto">
+            <span class="tech-tag">Python</span>
+            <span class="tech-tag">scikit-learn</span>
+            <span class="tech-tag">NLTK</span>
+            <span class="tech-tag">Pandas</span>
+          </div>
+          <div class="project-glow"></div>
+        </div>
+
+        <!-- Project 2 -->
+        <div class="project-card reveal-item group" style="animation-delay:0.1s">
+          <div class="project-header">
+            <div class="flex items-start justify-between">
+              <div>
+                <div class="font-mono text-xs text-emerald-400 mb-2">Web Dev · JavaScript</div>
+                <h3 class="text-xl font-bold text-white group-hover:text-emerald-400 transition-colors">DevDash – Dev Productivity App</h3>
+              </div>
+              <div class="project-links flex gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                <a href="#" class="font-mono text-xs text-slate-400 hover:text-emerald-400">GitHub ↗</a>
+                <a href="#" class="font-mono text-xs text-slate-400 hover:text-emerald-400">Live ↗</a>
+              </div>
+            </div>
+          </div>
+          <p class="text-slate-400 text-sm leading-relaxed my-4">
+            A minimalist browser-based dashboard for developers: Pomodoro timer, quick notes,
+            GitHub streak tracker, and daily LeetCode problem — all in one tab.
+          </p>
+          <div class="flex flex-wrap gap-2 mt-auto">
+            <span class="tech-tag">HTML</span>
+            <span class="tech-tag">CSS</span>
+            <span class="tech-tag">JavaScript</span>
+            <span class="tech-tag">GitHub API</span>
+          </div>
+          <div class="project-glow emerald"></div>
+        </div>
+
+        <!-- Project 3 -->
+        <div class="project-card reveal-item group" style="animation-delay:0.2s">
+          <div class="project-header">
+            <div class="flex items-start justify-between">
+              <div>
+                <div class="font-mono text-xs text-cyan-400 mb-2">Python · DSA</div>
+                <h3 class="text-xl font-bold text-white group-hover:text-cyan-400 transition-colors">Pathfinding Visualizer</h3>
+              </div>
+              <div class="project-links flex gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                <a href="#" class="font-mono text-xs text-slate-400 hover:text-cyan-400">GitHub ↗</a>
+              </div>
+            </div>
+          </div>
+          <p class="text-slate-400 text-sm leading-relaxed my-4">
+            Interactive grid-based tool to visualize BFS, DFS, Dijkstra's, and A* algorithms.
+            Built to deeply understand graph traversal by seeing it in motion.
+          </p>
+          <div class="flex flex-wrap gap-2 mt-auto">
+            <span class="tech-tag">Python</span>
+            <span class="tech-tag">Pygame</span>
+            <span class="tech-tag">Algorithms</span>
+          </div>
+          <div class="project-glow"></div>
+        </div>
+
+        <!-- Project 4 -->
+        <div class="project-card reveal-item group" style="animation-delay:0.3s">
+          <div class="project-header">
+            <div class="flex items-start justify-between">
+              <div>
+                <div class="font-mono text-xs text-emerald-400 mb-2">C · Systems</div>
+                <h3 class="text-xl font-bold text-white group-hover:text-emerald-400 transition-colors">Mini Shell (Unix CLI)</h3>
+              </div>
+              <div class="project-links flex gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                <a href="#" class="font-mono text-xs text-slate-400 hover:text-emerald-400">GitHub ↗</a>
+              </div>
+            </div>
+          </div>
+          <p class="text-slate-400 text-sm leading-relaxed my-4">
+            A minimal Unix shell written in C that handles piping, redirection,
+            background processes, and built-in commands. A deep dive into systems programming.
+          </p>
+          <div class="flex flex-wrap gap-2 mt-auto">
+            <span class="tech-tag">C</span>
+            <span class="tech-tag">Linux</span>
+            <span class="tech-tag">Unix Syscalls</span>
+            <span class="tech-tag">Systems</span>
+          </div>
+          <div class="project-glow emerald"></div>
+        </div>
+
+      </div>
+
+      <!-- More projects note -->
+      <div class="text-center mt-10 reveal-item">
+        <a href="#" class="font-mono text-sm text-slate-500 hover:text-cyan-400 transition-colors border-b border-dashed border-slate-700 pb-0.5">
+          View more on GitHub →
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════
+       EDUCATION SECTION
+  ═══════════════════════════════════════════ -->
+  <section id="education" class="py-28 border-t border-slate-800/50">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="text-center mb-16 reveal-item">
+        <div class="section-label font-mono text-xs text-cyan-400 tracking-[0.3em] mb-3">04 / EDUCATION</div>
+        <h2 class="text-3xl sm:text-4xl font-extrabold">
+          Academic <span class="gradient-text">Journey</span>
+        </h2>
+      </div>
+
+      <div class="relative max-w-3xl mx-auto">
+        <!-- Timeline line -->
+        <div class="absolute left-5 top-0 bottom-0 w-px bg-gradient-to-b from-cyan-400/50 via-slate-700 to-transparent"></div>
+
+        <!-- Education item 1 -->
+        <div class="relative pl-16 pb-14 reveal-item">
+          <div class="absolute left-0 top-1 w-10 h-10 rounded-full border-2 border-cyan-400 bg-slate-950 flex items-center justify-center">
+            <span class="text-cyan-400 text-sm">🎓</span>
+          </div>
+          <div class="border border-slate-800 bg-slate-900/60 p-6 rounded-sm hover:border-cyan-400/30 transition-all">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-3">
+              <div>
+                <h3 class="text-lg font-bold text-white">B.Tech — Computer Science Engineering</h3>
+                <div class="text-cyan-400 font-mono text-sm mt-1">Manav Rachna Institute of Research and Studies</div>
+              </div>
+              <div class="font-mono text-xs text-slate-500 bg-slate-800 px-3 py-1 rounded-sm self-start sm:self-center whitespace-nowrap">
+                2024 – 2028
+              </div>
+            </div>
+            <p class="text-slate-400 text-sm leading-relaxed">
+              Pursuing core CS fundamentals including data structures, algorithms, operating systems,
+              and software engineering. Actively supplementing coursework with self-directed
+              learning in Python, AI/ML, and system design.
+            </p>
+            <div class="flex flex-wrap gap-2 mt-4">
+              <span class="tech-tag">DSA</span>
+              <span class="tech-tag">OS</span>
+              <span class="tech-tag">DBMS</span>
+              <span class="tech-tag">OOP</span>
+              <span class="tech-tag">Networks</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Education item 2 -->
+        <div class="relative pl-16 pb-14 reveal-item" style="animation-delay:0.1s">
+          <div class="absolute left-0 top-1 w-10 h-10 rounded-full border-2 border-slate-600 bg-slate-950 flex items-center justify-center">
+            <span class="text-slate-400 text-sm">🏫</span>
+          </div>
+          <div class="border border-slate-800 bg-slate-900/60 p-6 rounded-sm hover:border-slate-600/50 transition-all">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-3">
+              <div>
+                <h3 class="text-lg font-bold text-white">Class XII — Science (PCM + CS)</h3>
+                <div class="text-slate-400 font-mono text-sm mt-1">Senior Secondary School</div>
+              </div>
+              <div class="font-mono text-xs text-slate-500 bg-slate-800 px-3 py-1 rounded-sm self-start sm:self-center">
+                2024
+              </div>
+            </div>
+            <p class="text-slate-400 text-sm leading-relaxed">
+              Completed with Physics, Chemistry, Mathematics and Computer Science.
+              First exposure to programming with C++ and problem-solving concepts.
+            </p>
+          </div>
+        </div>
+
+        <!-- Certifications / Self-learning -->
+        <div class="relative pl-16 reveal-item" style="animation-delay:0.2s">
+          <div class="absolute left-0 top-1 w-10 h-10 rounded-full border-2 border-emerald-400/60 bg-slate-950 flex items-center justify-center">
+            <span class="text-emerald-400 text-sm">📜</span>
+          </div>
+          <div class="border border-slate-800 bg-slate-900/60 p-6 rounded-sm hover:border-emerald-400/20 transition-all">
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="text-lg font-bold text-white">Self-Learning & Certifications</h3>
+              <div class="font-mono text-xs text-emerald-400 bg-emerald-400/10 px-3 py-1 rounded-sm">Ongoing</div>
+            </div>
+            <p class="text-slate-400 text-sm leading-relaxed">
+              Continuously learning through structured courses, documentation, and
+              building real projects. Current focus: Python, ML fundamentals, system design patterns.
+            </p>
+            <div class="flex flex-wrap gap-2 mt-4">
+              <span class="tech-tag emerald">Python (CS50P)</span>
+              <span class="tech-tag emerald">ML Foundations</span>
+              <span class="tech-tag emerald">Git Mastery</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════
+       CONTACT SECTION
+  ═══════════════════════════════════════════ -->
+  <section id="contact" class="py-28 border-t border-slate-800/50">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="text-center mb-16 reveal-item">
+        <div class="section-label font-mono text-xs text-cyan-400 tracking-[0.3em] mb-3">05 / CONTACT</div>
+        <h2 class="text-3xl sm:text-4xl font-extrabold">
+          Let's <span class="gradient-text">Connect</span>
+        </h2>
+        <p class="text-slate-400 mt-4 max-w-md mx-auto text-sm">
+          Open to collaborations, projects, and opportunities.
+          Drop a message — I reply to everything.
+        </p>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-12 items-start max-w-4xl mx-auto">
+        <!-- Left: form -->
+        <div class="reveal-item">
+          <form id="contactForm" class="space-y-4">
+            <div>
+              <label class="block font-mono text-xs text-slate-500 mb-2">YOUR NAME</label>
+              <input type="text" placeholder="Riya Sharma" required
+                class="w-full bg-slate-900 border border-slate-700 text-slate-200 placeholder-slate-600 px-4 py-3 font-mono text-sm rounded-sm focus:outline-none focus:border-cyan-400 transition-colors" />
+            </div>
+            <div>
+              <label class="block font-mono text-xs text-slate-500 mb-2">YOUR EMAIL</label>
+              <input type="email" placeholder="hello@example.com" required
+                class="w-full bg-slate-900 border border-slate-700 text-slate-200 placeholder-slate-600 px-4 py-3 font-mono text-sm rounded-sm focus:outline-none focus:border-cyan-400 transition-colors" />
+            </div>
+            <div>
+              <label class="block font-mono text-xs text-slate-500 mb-2">SUBJECT</label>
+              <input type="text" placeholder="Let's work together" required
+                class="w-full bg-slate-900 border border-slate-700 text-slate-200 placeholder-slate-600 px-4 py-3 font-mono text-sm rounded-sm focus:outline-none focus:border-cyan-400 transition-colors" />
+            </div>
+            <div>
+              <label class="block font-mono text-xs text-slate-500 mb-2">MESSAGE</label>
+              <textarea rows="4" placeholder="What's on your mind..." required
+                class="w-full bg-slate-900 border border-slate-700 text-slate-200 placeholder-slate-600 px-4 py-3 font-mono text-sm rounded-sm focus:outline-none focus:border-cyan-400 transition-colors resize-none"></textarea>
+            </div>
+            <button type="submit"
+              class="w-full bg-cyan-400 text-slate-950 font-sans font-bold py-3 px-6 rounded-sm hover:bg-cyan-300 transition-all hover:shadow-[0_0_20px_rgba(34,211,238,0.4)] active:scale-95 text-sm tracking-wide">
+              Send Message →
+            </button>
+            <div id="formSuccess" class="hidden text-emerald-400 font-mono text-xs text-center pt-1">
+              ✓ Message sent successfully!
+            </div>
+          </form>
+        </div>
+
+        <!-- Right: info + social -->
+        <div class="reveal-item space-y-8" style="animation-delay:0.15s">
+          <div>
+            <h3 class="font-bold text-lg mb-4">Reach me at</h3>
+            <div class="space-y-3">
+              <a href="mailto:pranav@example.com"
+                class="flex items-center gap-3 text-slate-400 hover:text-cyan-400 transition-colors group">
+                <span class="w-8 h-8 border border-slate-700 group-hover:border-cyan-400 rounded-sm flex items-center justify-center text-xs transition-colors">@</span>
+                <span class="font-mono text-sm">pranav@example.com</span>
+              </a>
+              <div class="flex items-center gap-3 text-slate-400">
+                <span class="w-8 h-8 border border-slate-700 rounded-sm flex items-center justify-center text-xs">📍</span>
+                <span class="font-mono text-sm">Gurugram, Haryana, India</span>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <h3 class="font-bold text-lg mb-4">Find me online</h3>
+            <div class="flex gap-3">
+              <a href="#" class="social-btn group">
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+                <span>GitHub</span>
+              </a>
+              <a href="#" class="social-btn group">
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+                <span>LinkedIn</span>
+              </a>
+              <a href="#" class="social-btn group">
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/></svg>
+                <span>Twitter</span>
+              </a>
+            </div>
+          </div>
+
+          <!-- Status availability card -->
+          <div class="border border-emerald-400/30 bg-emerald-400/5 p-5 rounded-sm">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+              <span class="font-mono text-xs text-emerald-400 font-bold">AVAILABLE</span>
+            </div>
+            <p class="text-slate-400 text-sm">
+              Open to internships, hackathons, and open source collaboration.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════
+       FOOTER
+  ═══════════════════════════════════════════ -->
+  <footer class="border-t border-slate-800 py-8">
+    <div class="max-w-6xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div class="font-mono text-xs text-slate-600">
+        © 2024 <span class="text-slate-500">Pranav Aggarwal</span> — Built with curiosity &amp; coffee.
+      </div>
+      <div class="font-mono text-xs text-slate-700">
+        <span class="text-cyan-400/40">&lt;</span>crafted in HTML + Tailwind<span class="text-cyan-400/40">/&gt;</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
